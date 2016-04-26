@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		180BC6D31CCFD5AA0004074B /* AVExportHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 180BC6D21CCFD5AA0004074B /* AVExportHandler.m */; };
 		4B62367EDA0D6C2BD6DA7771 /* Pods_AVStitch_Tests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 50618CC0FB09DC2DC0A5C233 /* Pods_AVStitch_Tests.framework */; };
 		6003F58E195388D20070C39A /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6003F58D195388D20070C39A /* Foundation.framework */; };
 		6003F590195388D20070C39A /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6003F58F195388D20070C39A /* CoreGraphics.framework */; };
@@ -37,6 +38,8 @@
 
 /* Begin PBXFileReference section */
 		0E597FCFCB6E39629EF3DAF8 /* Pods-AVStitch_Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AVStitch_Tests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-AVStitch_Tests/Pods-AVStitch_Tests.debug.xcconfig"; sourceTree = "<group>"; };
+		180BC6D11CCFD5AA0004074B /* AVExportHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AVExportHandler.h; sourceTree = "<group>"; };
+		180BC6D21CCFD5AA0004074B /* AVExportHandler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AVExportHandler.m; sourceTree = "<group>"; };
 		4BEB2D40DA54937D0ABFDFE2 /* Pods_AVStitch_Example.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_AVStitch_Example.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		50618CC0FB09DC2DC0A5C233 /* Pods_AVStitch_Tests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_AVStitch_Tests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		5827D16D454D2A20AB8FC638 /* Pods-AVStitch_Example.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-AVStitch_Example.debug.xcconfig"; path = "Pods/Target Support Files/Pods-AVStitch_Example/Pods-AVStitch_Example.debug.xcconfig"; sourceTree = "<group>"; };
@@ -141,6 +144,8 @@
 		6003F593195388D20070C39A /* Example for AVStitch */ = {
 			isa = PBXGroup;
 			children = (
+				180BC6D11CCFD5AA0004074B /* AVExportHandler.h */,
+				180BC6D21CCFD5AA0004074B /* AVExportHandler.m */,
 				6003F59C195388D20070C39A /* AVAppDelegate.h */,
 				6003F59D195388D20070C39A /* AVAppDelegate.m */,
 				873B8AEA1B1F5CCA007FD442 /* Main.storyboard */,
@@ -392,6 +397,7 @@
 			files = (
 				6003F59E195388D20070C39A /* AVAppDelegate.m in Sources */,
 				6003F5A7195388D20070C39A /* AVViewController.m in Sources */,
+				180BC6D31CCFD5AA0004074B /* AVExportHandler.m in Sources */,
 				6003F59A195388D20070C39A /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
