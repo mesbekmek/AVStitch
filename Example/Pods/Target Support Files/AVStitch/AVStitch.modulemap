@@ -1,0 +1,6 @@
+framework module AVStitch {
+  umbrella header "AVStitch-umbrella.h"
+
+  export *
+  module * { export * }
+}

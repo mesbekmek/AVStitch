@@ -1,0 +1,14 @@
+PODS:
+  - AVStitch (0.1.0)
+
+DEPENDENCIES:
+  - AVStitch (from `../`)
+
+EXTERNAL SOURCES:
+  AVStitch:
+    :path: ../
+
+SPEC CHECKSUMS:
+  AVStitch: a1afb583077792c1bd199d5d97df899f1488b1bb
+
+COCOAPODS: 0.39.0
