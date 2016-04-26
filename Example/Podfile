@@ -1,0 +1,11 @@
+use_frameworks!
+
+target 'AVStitch_Example', :exclusive => true do
+  pod 'AVStitch', :path => '../'
+end
+
+target 'AVStitch_Tests', :exclusive => true do
+  pod 'AVStitch', :path => '../'
+
+  
+end
