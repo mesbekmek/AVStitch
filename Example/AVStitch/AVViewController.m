@@ -7,6 +7,7 @@
 //
 
 #import "AVViewController.h"
+#import "AVExportHandler.h"
 
 @interface AVViewController ()
 

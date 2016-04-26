@@ -49,7 +49,7 @@
             default:
             {
                 NSLog(@"default");
-//                onCompletion(nil,NO);
+                //                onCompletion(nil,NO);
             }
         }
     }];
@@ -70,74 +70,80 @@
 
 
 - (AVMutableComposition *)mergeVideosFrom:(NSMutableArray <AVAsset *> *)videosArray{
-    AVMutableComposition *mixComposition = [AVMutableComposition composition];
-    AVMutableCompositionTrack *videoCompositionTrack = [mixComposition addMutableTrackWithMediaType:AVMediaTypeVideo preferredTrackID:kCMPersistentTrackID_Invalid];
     
-    AVMutableCompositionTrack *audioCompositionTrack = [mixComposition addMutableTrackWithMediaType:AVMediaTypeAudio preferredTrackID:kCMPersistentTrackID_Invalid];
-    
-    CGSize size = CGSizeZero;
-    CMTime time = kCMTimeZero;
-    
-    NSMutableArray *instructions = [NSMutableArray new];
-    
-    for(AVAsset *asset in videosArray)
-    {
-        AVAssetTrack *videoAssetTrack = [asset tracksWithMediaType:AVMediaTypeVideo].firstObject;
+    dispatch_async(DISPATCH_QUEUE_PRIORITY_BACKGROUND, ^{
         
-        NSError *videoError;
-        [videoCompositionTrack insertTimeRange:CMTimeRangeMake(kCMTimeZero, videoAssetTrack.timeRange.duration)
-                                       ofTrack:videoAssetTrack
-                                        atTime:time
-                                         error:&videoError];
-        //Added this line in an attempt to fix the orientation
-        videoCompositionTrack.preferredTransform = videoAssetTrack.preferredTransform;
-        //
-        if (videoError) {
-            NSLog(@"Error - %@", videoError.debugDescription);
+        
+        AVMutableComposition *mixComposition = [AVMutableComposition composition];
+        AVMutableCompositionTrack *videoCompositionTrack = [mixComposition addMutableTrackWithMediaType:AVMediaTypeVideo preferredTrackID:kCMPersistentTrackID_Invalid];
+        
+        AVMutableCompositionTrack *audioCompositionTrack = [mixComposition addMutableTrackWithMediaType:AVMediaTypeAudio preferredTrackID:kCMPersistentTrackID_Invalid];
+        
+        CGSize size = CGSizeZero;
+        CMTime time = kCMTimeZero;
+        
+        NSMutableArray *instructions = [NSMutableArray new];
+        
+        for(AVAsset *asset in videosArray)
+        {
+            AVAssetTrack *videoAssetTrack = [asset tracksWithMediaType:AVMediaTypeVideo].firstObject;
+            
+            NSError *videoError;
+            [videoCompositionTrack insertTimeRange:CMTimeRangeMake(kCMTimeZero, videoAssetTrack.timeRange.duration)
+                                           ofTrack:videoAssetTrack
+                                            atTime:time
+                                             error:&videoError];
+            //Added this line in an attempt to fix the orientation
+            videoCompositionTrack.preferredTransform = videoAssetTrack.preferredTransform;
+            //
+            if (videoError) {
+                NSLog(@"Error - %@", videoError.debugDescription);
+            }
+            
+            AVAssetTrack *audioAssetTrack = [asset tracksWithMediaType:AVMediaTypeAudio].firstObject;
+            
+            NSError *audioError;
+            [audioCompositionTrack insertTimeRange:CMTimeRangeMake(kCMTimeZero, videoAssetTrack.timeRange.duration)
+                                           ofTrack:audioAssetTrack
+                                            atTime:time
+                                             error:&audioError];
+            if (audioError) {
+                NSLog(@"Error - %@", audioError.debugDescription);
+            }
+            AVMutableVideoCompositionInstruction *videoCompositionInstruction = [AVMutableVideoCompositionInstruction videoCompositionInstruction];
+            videoCompositionInstruction.timeRange = CMTimeRangeMake(time, videoAssetTrack.timeRange.duration);
+            videoCompositionInstruction.layerInstructions = @[[AVMutableVideoCompositionLayerInstruction videoCompositionLayerInstructionWithAssetTrack:videoCompositionTrack]];
+            [instructions addObject:videoCompositionInstruction];
+            
+            time = CMTimeAdd(time, videoAssetTrack.timeRange.duration);
+            
+            if (CGSizeEqualToSize(size, CGSizeZero)) {
+                size = videoAssetTrack.naturalSize;;
+            }
         }
         
-        AVAssetTrack *audioAssetTrack = [asset tracksWithMediaType:AVMediaTypeAudio].firstObject;
-        
-        NSError *audioError;
-        [audioCompositionTrack insertTimeRange:CMTimeRangeMake(kCMTimeZero, videoAssetTrack.timeRange.duration)
-                                       ofTrack:audioAssetTrack
-                                        atTime:time
-                                         error:&audioError];
-        if (audioError) {
-            NSLog(@"Error - %@", audioError.debugDescription);
-        }
-        AVMutableVideoCompositionInstruction *videoCompositionInstruction = [AVMutableVideoCompositionInstruction videoCompositionInstruction];
-        videoCompositionInstruction.timeRange = CMTimeRangeMake(time, videoAssetTrack.timeRange.duration);
-        videoCompositionInstruction.layerInstructions = @[[AVMutableVideoCompositionLayerInstruction videoCompositionLayerInstructionWithAssetTrack:videoCompositionTrack]];
-        [instructions addObject:videoCompositionInstruction];
-        
-        time = CMTimeAdd(time, videoAssetTrack.timeRange.duration);
-        
-        if (CGSizeEqualToSize(size, CGSizeZero)) {
-            size = videoAssetTrack.naturalSize;;
-        }
-    }
+    });
     
-    sizeRef = size;
-    instructionsArray = instructions;
-    return mixComposition;
-    
-
+    dispatch_async(dispatch_get_main_queue(), ^{
+        sizeRef = size;
+        instructionsArray = instructions;
+        return mixComposition;
+    });
 }
 
 - (AVPlayerItem *)playerItemFromVideosArray:(NSMutableArray <AVAsset *> *)videosArray{
     
     AVMutableComposition *mixComposition = [self mergeVideosFrom:videosArray];
     
-        AVMutableVideoComposition *mutableVideoComposition = [AVMutableVideoComposition videoComposition];
-        mutableVideoComposition.instructions = instructionsArray;
-        mutableVideoComposition.frameDuration = CMTimeMake(1, 30);
-        mutableVideoComposition.renderSize = sizeRef;
+    AVMutableVideoComposition *mutableVideoComposition = [AVMutableVideoComposition videoComposition];
+    mutableVideoComposition.instructions = instructionsArray;
+    mutableVideoComposition.frameDuration = CMTimeMake(1, 30);
+    mutableVideoComposition.renderSize = sizeRef;
     
-        AVPlayerItem *pi = [AVPlayerItem playerItemWithAsset:mixComposition];
-        pi.videoComposition = mutableVideoComposition;
-        
-        return pi;
+    AVPlayerItem *pi = [AVPlayerItem playerItemWithAsset:mixComposition];
+    pi.videoComposition = mutableVideoComposition;
+    
+    return pi;
     
 }
 
