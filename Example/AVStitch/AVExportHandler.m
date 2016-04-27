@@ -2,7 +2,7 @@
 
 #import "AVExportHandler.h"
 
-@implementation AVExportHandler{
+@implementation AVExportHandler {
     
     CGSize sizeRef;
     NSMutableArray *instructionsArray;
@@ -12,7 +12,7 @@
 - (void)exportMixComposition:(AVMutableComposition *)mixComposition completion:(void (^)(NSURL *url, BOOL success))onCompletion{
     
     NSURL *randomFinalVideoFileURL = [self getRandomVideoFileURL];
-    AVAssetExportSession *exportSession = [[AVAssetExportSession alloc] initWithAsset:mixComposition presetName:AVAssetExportPresetMediumQuality];
+    AVAssetExportSession *exportSession = [[AVAssetExportSession alloc] initWithAsset:mixComposition presetName:AVAssetExportPresetHighestQuality];
     exportSession.outputFileType=AVFileTypeQuickTimeMovie;
     exportSession.outputURL = randomFinalVideoFileURL;
     
@@ -43,7 +43,6 @@
             default:
             {
                 NSLog(@"default");
-                //                onCompletion(nil,NO);
             }
         }
     }];
@@ -63,7 +62,7 @@
 }
 
 
-- (void)mergeVideosFrom:(NSMutableArray <AVAsset *> *)videosArray completion:(void(^)(AVMutableComposition *composition, NSError *error))onCompletion {
+- (void)mergeVideosFrom:(NSArray <AVAsset *> *)videosArray completion:(void(^)(AVMutableComposition *composition, NSError *error))onCompletion {
     
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
         
@@ -78,7 +77,7 @@
         
         NSMutableArray *instructions = [NSMutableArray new];
         
-        for(AVAsset *asset in videosArray)
+        for(AVAsset *asset in videosArray.copy)
         {
             AVAssetTrack *videoAssetTrack = [asset tracksWithMediaType:AVMediaTypeVideo].firstObject;
             
@@ -87,12 +86,14 @@
                                            ofTrack:videoAssetTrack
                                             atTime:time
                                              error:&videoError];
-            //Added this line in an attempt to fix the orientation
+            
             videoCompositionTrack.preferredTransform = videoAssetTrack.preferredTransform;
-            //
             if (videoError) {
                 NSLog(@"Error - %@", videoError.debugDescription);
-                onCompletion(nil,videoError);
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    onCompletion(nil,videoError);
+                });
+                
             }
             
             AVAssetTrack *audioAssetTrack = [asset tracksWithMediaType:AVMediaTypeAudio].firstObject;
@@ -104,7 +105,10 @@
                                              error:&audioError];
             if (audioError) {
                 NSLog(@"Error - %@", audioError.debugDescription);
-                onCompletion(nil,videoError);
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    onCompletion(nil,videoError);
+                });
+                
             }
             AVMutableVideoCompositionInstruction *videoCompositionInstruction = [AVMutableVideoCompositionInstruction videoCompositionInstruction];
             videoCompositionInstruction.timeRange = CMTimeRangeMake(time, videoAssetTrack.timeRange.duration);
@@ -114,7 +118,7 @@
             time = CMTimeAdd(time, videoAssetTrack.timeRange.duration);
             
             if (CGSizeEqualToSize(size, CGSizeZero)) {
-                size = videoAssetTrack.naturalSize;;
+                size = videoAssetTrack.naturalSize;
             }
         }
         dispatch_async(dispatch_get_main_queue(), ^{
@@ -126,12 +130,12 @@
     });
 }
 
-- (void)playerItemFromVideosArray:(NSMutableArray <AVAsset *> *)videosArray completion:(void(^)(AVPlayerItem *playerItem, NSError *error))completion {
+- (void)playerItemFromVideosArray:(NSArray <AVAsset *> *)videosArray completion:(void(^)(AVPlayerItem *playerItem, NSError *error))completion {
     
     __block AVMutableComposition *mixComposition;
     __block AVMutableVideoComposition *mutableVideoComposition;
     
-    [self mergeVideosFrom:videosArray completion:^(AVMutableComposition *composition, NSError *error) {
+    [self mergeVideosFrom:videosArray.copy completion:^(AVMutableComposition *composition, NSError *error) {
         
         if (!error) {
             mixComposition = composition;

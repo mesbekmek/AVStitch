@@ -10,6 +10,7 @@
 @import AVFoundation;
 
 @interface AVVideoViewController : UIViewController
+
 @property (strong, nonatomic) AVPlayer *avPlayer;
 
 @end

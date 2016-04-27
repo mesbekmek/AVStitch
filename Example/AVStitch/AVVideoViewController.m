@@ -21,6 +21,9 @@
 
 @implementation AVVideoViewController
 
+
+#pragma mark - Life Cycle Methods
+
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.view.backgroundColor = [UIColor blackColor];
@@ -28,35 +31,9 @@
     [self cancelButton];
 }
 
-- (void)performSetUpForAVPlayer{
-    self.avPlayer.actionAtItemEnd = AVPlayerActionAtItemEndNone;
-    
-    self.avPlayerLayer = [AVPlayerLayer playerLayerWithPlayer:self.avPlayer];
-    //self.avPlayerLayer.frame = self.view.bounds;
-    self.avPlayerLayer.videoGravity = AVLayerVideoGravityResize;
-    
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(playerItemDidReachEnd:)
-                                                 name:AVPlayerItemDidPlayToEndTimeNotification
-                                               object:[self.avPlayer currentItem]];
-    
-    CGRect screenRect = [[UIScreen mainScreen] bounds];
-    //    screenRect = self.view.bounds;
-    self.avPlayerLayer.frame = CGRectMake(0,
-                                          0, screenRect.size.width, screenRect.size.height);
-    [self.view.layer addSublayer:self.avPlayerLayer];
-    
-    [self.cancelButton addTarget:self action:@selector(cancelButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
-    
-    [self.view addSubview:self.cancelButton];
-    [self.cancelButton setBackgroundImage:[UIImage imageNamed:@"close"] forState:UIControlStateNormal];
-    self.cancelButton.frame = CGRectMake(0, 20, 35, 35);
-    
-    [self.avPlayer play];
-    self.isPlaying = YES;
-}
+#pragma mark - UI Setup Methods
 
-- (void)setUpActivityIndicator{
+- (void)setUpActivityIndicator {
     self.spinnerView = [[UIView alloc] initWithFrame:self.view.bounds];
     UIActivityIndicatorView *activityIndicator=[[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
     
@@ -72,39 +49,13 @@
     
 }
 
-- (void)dismissSpinnerView{
-    
-    if (self.spinnerView) {
-        [self.spinnerView removeFromSuperview];
-    }
-    
-}
-
-- (void)playerItemDidReachEnd:(NSNotification *)notification {
-    self.isPlaying = NO;
-    
-    if (!self.replay) {
-        [self setUpReplayButton];
-    }
-    self.replay.hidden = NO;
-    self.playerItem = [notification object];
-}
-
-- (void)setUpReplayButton{
+- (void)setUpReplayButton {
     
     self.replay = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, 50, 50)];
     [self.replay addTarget:self action:@selector(replayVideo:) forControlEvents:UIControlEventAllTouchEvents];
     self.replay.center = self.view.center;
     [self.replay setBackgroundImage:[UIImage imageNamed:@"reload"] forState:UIControlStateNormal];
     [self.view addSubview:self.replay];
-    
-}
-
-- (void)replayVideo:(UIButton *)replayButton{
-    
-    self.replay.hidden = YES;
-    self.isPlaying = NO;
-    [self.playerItem seekToTime:kCMTimeZero];
     
 }
 
@@ -129,9 +80,10 @@
         
         _cancelButton = button;
     }
-    
     return _cancelButton;
 }
+
+#pragma mark - Private methods
 
 - (void)performFailureAlert{
     
@@ -149,5 +101,58 @@
     [self dismissViewControllerAnimated:YES completion:nil];
 }
 
+- (void)dismissSpinnerView{
+    
+    if (self.spinnerView) {
+        [self.spinnerView removeFromSuperview];
+    }
+    
+}
+
+- (void)replayVideo:(UIButton *)replayButton{
+    
+    self.replay.hidden = YES;
+    self.isPlaying = NO;
+    [self.playerItem seekToTime:kCMTimeZero];
+    
+}
+
+- (void)performSetUpForAVPlayer{
+    self.avPlayer.actionAtItemEnd = AVPlayerActionAtItemEndNone;
+    
+    self.avPlayerLayer = [AVPlayerLayer playerLayerWithPlayer:self.avPlayer];
+    self.avPlayerLayer.videoGravity = AVLayerVideoGravityResize;
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(playerItemDidReachEnd:)
+                                                 name:AVPlayerItemDidPlayToEndTimeNotification
+                                               object:[self.avPlayer currentItem]];
+    
+    CGRect screenRect = [[UIScreen mainScreen] bounds];
+    self.avPlayerLayer.frame = CGRectMake(0,
+                                          0, screenRect.size.width, screenRect.size.height);
+    [self.view.layer addSublayer:self.avPlayerLayer];
+    
+    [self.cancelButton addTarget:self action:@selector(cancelButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
+    
+    [self.view addSubview:self.cancelButton];
+    [self.cancelButton setBackgroundImage:[UIImage imageNamed:@"close"] forState:UIControlStateNormal];
+    self.cancelButton.frame = CGRectMake(0, 20, 35, 35);
+    
+    [self.avPlayer play];
+    self.isPlaying = YES;
+}
+
+#pragma mark - Player Item Notification Method
+
+- (void)playerItemDidReachEnd:(NSNotification *)notification {
+    self.isPlaying = NO;
+    
+    if (!self.replay) {
+        [self setUpReplayButton];
+    }
+    self.replay.hidden = NO;
+    self.playerItem = [notification object];
+}
 
 @end

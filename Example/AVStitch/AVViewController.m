@@ -38,6 +38,8 @@ UINavigationControllerDelegate
 
 @implementation AVViewController
 
+#pragma mark - Life Cycle Methods
+
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.videoAssetsArray = [NSMutableArray new];
@@ -58,15 +60,6 @@ UINavigationControllerDelegate
 }
 
 
-#pragma mark - IBAction methods
-
-- (IBAction)recordButtonTapped:(UIButton *)sender {
-    [self setupCamera];
-}
-
-- (IBAction)mergeButtonTapped:(UIButton *)sender {
-    [self mergeVideosInArray:self.videoAssetsArray];
-}
 
 # pragma mark - Video camera setup
 
@@ -94,7 +87,7 @@ UINavigationControllerDelegate
 
 #pragma mark - Merge
 
-- (void)mergeVideosInArray:(NSMutableArray<AVAsset *>*)videosAssestsArray {
+- (void)mergeVideosInArray:(NSArray<AVAsset *>*)videosAssestsArray {
     
     [self.avPlayerLayer removeFromSuperlayer];
     self.avPlayerLayer =nil;
@@ -117,6 +110,16 @@ UINavigationControllerDelegate
             NSLog(@"Error - %@",error.localizedDescription);
         }
     }];
+}
+
+#pragma mark - IBAction methods
+
+- (IBAction)recordButtonTapped:(UIButton *)sender {
+    [self setupCamera];
+}
+
+- (IBAction)mergeButtonTapped:(UIButton *)sender {
+    [self mergeVideosInArray:self.videoAssetsArray];
 }
 
 
