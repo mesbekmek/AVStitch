@@ -98,6 +98,7 @@
 
 
 - (void)cancelButtonPressed:(UIButton *)button {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
     [self dismissViewControllerAnimated:YES completion:nil];
 }
 
