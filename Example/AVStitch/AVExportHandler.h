@@ -22,8 +22,8 @@
 
 - (void)exportMixComposition:(AVMutableComposition *)mixComposition completion:(void (^) (NSURL *url, BOOL success))onCompletion;
 
-- (AVMutableComposition *)mergeVideosFrom:(NSMutableArray <AVAsset *> *)videosArray;
+- (void)mergeVideosFrom:(NSMutableArray <AVAsset *> *)videosArray completion:(void(^)(AVMutableComposition *composition, NSError *error))onCompletion;
 
-- (AVPlayerItem *)playerItemFromVideosArray:(NSMutableArray <AVAsset *> *)videosArray;
+- (void)playerItemFromVideosArray:(NSMutableArray <AVAsset *> *)videosArray completion:(void(^)(AVPlayerItem *playerItem, NSError *error))completion;
 
 @end

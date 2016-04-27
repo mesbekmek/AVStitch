@@ -69,12 +69,12 @@
 }
 
 
-- (AVMutableComposition *)mergeVideosFrom:(NSMutableArray <AVAsset *> *)videosArray{
+- (void)mergeVideosFrom:(NSMutableArray <AVAsset *> *)videosArray completion:(void(^)(AVMutableComposition *composition, NSError *error))onCompletion {
     
-    dispatch_async(DISPATCH_QUEUE_PRIORITY_BACKGROUND, ^{
-        
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0),^{
         
         AVMutableComposition *mixComposition = [AVMutableComposition composition];
+        
         AVMutableCompositionTrack *videoCompositionTrack = [mixComposition addMutableTrackWithMediaType:AVMediaTypeVideo preferredTrackID:kCMPersistentTrackID_Invalid];
         
         AVMutableCompositionTrack *audioCompositionTrack = [mixComposition addMutableTrackWithMediaType:AVMediaTypeAudio preferredTrackID:kCMPersistentTrackID_Invalid];
@@ -98,6 +98,7 @@
             //
             if (videoError) {
                 NSLog(@"Error - %@", videoError.debugDescription);
+                onCompletion(nil,videoError);
             }
             
             AVAssetTrack *audioAssetTrack = [asset tracksWithMediaType:AVMediaTypeAudio].firstObject;
@@ -109,6 +110,7 @@
                                              error:&audioError];
             if (audioError) {
                 NSLog(@"Error - %@", audioError.debugDescription);
+                onCompletion(nil,videoError);
             }
             AVMutableVideoCompositionInstruction *videoCompositionInstruction = [AVMutableVideoCompositionInstruction videoCompositionInstruction];
             videoCompositionInstruction.timeRange = CMTimeRangeMake(time, videoAssetTrack.timeRange.duration);
@@ -121,30 +123,37 @@
                 size = videoAssetTrack.naturalSize;;
             }
         }
-        
-    });
-    
-    dispatch_async(dispatch_get_main_queue(), ^{
-        sizeRef = size;
-        instructionsArray = instructions;
-        return mixComposition;
+        dispatch_async(dispatch_get_main_queue(), ^{
+            sizeRef = size;
+            instructionsArray = instructions;
+            onCompletion(mixComposition,nil);
+            
+        });
     });
 }
 
-- (AVPlayerItem *)playerItemFromVideosArray:(NSMutableArray <AVAsset *> *)videosArray{
+- (void)playerItemFromVideosArray:(NSMutableArray <AVAsset *> *)videosArray completion:(void(^)(AVPlayerItem *playerItem, NSError *error))completion {
     
-    AVMutableComposition *mixComposition = [self mergeVideosFrom:videosArray];
+    __block AVMutableComposition *mixComposition;
+    __block AVMutableVideoComposition *mutableVideoComposition;
     
-    AVMutableVideoComposition *mutableVideoComposition = [AVMutableVideoComposition videoComposition];
-    mutableVideoComposition.instructions = instructionsArray;
-    mutableVideoComposition.frameDuration = CMTimeMake(1, 30);
-    mutableVideoComposition.renderSize = sizeRef;
-    
-    AVPlayerItem *pi = [AVPlayerItem playerItemWithAsset:mixComposition];
-    pi.videoComposition = mutableVideoComposition;
-    
-    return pi;
-    
+    [self mergeVideosFrom:videosArray completion:^(AVMutableComposition *composition, NSError *error) {
+        
+        if (!error) {
+            mixComposition = composition;
+            mutableVideoComposition = [AVMutableVideoComposition videoComposition];
+            mutableVideoComposition.instructions = instructionsArray;
+            mutableVideoComposition.frameDuration = CMTimeMake(1, 30);
+            mutableVideoComposition.renderSize = sizeRef;
+            
+            AVPlayerItem *pi = [AVPlayerItem playerItemWithAsset:mixComposition];
+            pi.videoComposition = mutableVideoComposition;
+            completion(pi,nil);
+        }
+        else {
+            completion(nil,error);
+        }
+    }];
 }
 
 
