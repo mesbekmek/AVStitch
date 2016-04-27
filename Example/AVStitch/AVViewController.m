@@ -15,7 +15,11 @@
 const float kVideoLengthMax2 = 10.0;
 
 
-@interface AVViewController ()<UIImagePickerControllerDelegate>
+@interface AVViewController ()
+<
+UIImagePickerControllerDelegate,
+UINavigationControllerDelegate
+>
 
 @property (nonatomic) UIImagePickerController *imagePicker;
 
@@ -47,7 +51,7 @@ const float kVideoLengthMax2 = 10.0;
     
     [self.videoAssetsArray addObject:[AVAsset assetWithURL:info[UIImagePickerControllerMediaURL]]];
     
-    self.mergeButton.enabled = self.videoAssetsArray.count > 1 ? YES : NO;
+    self.mergeButton.enabled = self.videoAssetsArray.count > 1;
     
     [picker dismissViewControllerAnimated:YES completion:nil];
     [self showSuccessAlert];
