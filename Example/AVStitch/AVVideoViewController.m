@@ -27,8 +27,9 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.view.backgroundColor = [UIColor blackColor];
+    [self setupCancelButton];
     [self performSetUpForAVPlayer];
-    [self cancelButton];
+    
 }
 
 #pragma mark - UI Setup Methods
@@ -63,8 +64,9 @@
     return YES;
 }
 
-- (UIButton *)cancelButton {
-    if(!_cancelButton) {
+- (UIButton *)setupCancelButton {
+    
+    if(!self.cancelButton) {
         
         UIButton *button = [UIButton buttonWithType:UIButtonTypeSystem];
         button.tintColor = [UIColor whiteColor];
@@ -78,9 +80,9 @@
         button.layer.shadowRadius = 1.0f;
         button.clipsToBounds = NO;
         
-        _cancelButton = button;
+        self.cancelButton = button;
     }
-    return _cancelButton;
+    return self.cancelButton;
 }
 
 #pragma mark - Private methods
