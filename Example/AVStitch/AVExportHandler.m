@@ -37,9 +37,9 @@
             {
                 onCompletion(exportSession.outputURL, nil);
             }
-            default:
+            case AVAssetExportSessionStatusUnknown:
             {
-                NSLog(@"default");
+                onCompletion(nil,exportSession.error);
             }
         }
     }];

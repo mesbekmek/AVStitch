@@ -5,7 +5,7 @@
 
 @property (nonatomic) AVMutableComposition *mixComposition;
 
-- (void)exportMixComposition:(AVMutableComposition *)mixComposition completion:(void (^) (NSURL *url, BOOL success))onCompletion;
+- (void)exportMixComposition:(AVMutableComposition *)mixComposition completion:(void (^)(NSURL *url, NSError *error))onCompletion;
 
 - (void)mergeVideosFrom:(NSArray <AVAsset *> *)videosArray completion:(void(^)(AVMutableComposition *composition, NSError *error))onCompletion;
 
