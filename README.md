@@ -25,8 +25,16 @@ pod "AVStitch"
 ##Documentation
 
 ###Implementation
-To use AVStitch you just need to import the 'AVExportHandler.h' file into the view controller where you will have AVAssets.
-For example if you use a camera, you would use the delegate 'imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary<NSString *,id> *)info' to store your video asset files in an array. Then when you are ready to merge the collection of videos, you would use the convenience method 'playerItemFromVideosArray: completion:' to merge the videos. This methods returns an 'AVPlayerItem' which you can then use to playback the merged videos.
+To use AVStitch you just need to import the `AVExportHandler.h` file into the view controller where you will have AVAssets.
+
+For example if you use a camera, you would use the delegate method:
+`imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary<NSString *,id> *)info`
+to store your video asset files in an array. 
+
+Then when you are ready to merge the collection of videos, you would use the `AVExportHandler` convenience method `playerItemFromVideosArray: completion:` to merge the videos.
+
+This methods returns an `AVPlayerItem` which you can then use to playback the merged videos or use as you see fit.
+
 The example below illustrates how to do this:
 ```objC
 - (void)mergeVideosInArray:(NSArray<AVAsset *>*)videosAssestsArray {
