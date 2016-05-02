@@ -9,7 +9,7 @@
     
 }
 
-- (void)exportMixComposition:(AVMutableComposition *)mixComposition completion:(void (^)(NSURL *url, NSError *error))onCompletion{
+- (void)exportMixComposition:(AVMutableComposition *)mixComposition completion:(void (^)(NSURL *url, float progress, NSError *error))onCompletion {
     
     NSURL *randomFinalVideoFileURL = [self getRandomVideoFileURL];
     AVAssetExportSession *exportSession = [[AVAssetExportSession alloc] initWithAsset:mixComposition presetName:AVAssetExportPresetHighestQuality];
@@ -26,20 +26,33 @@
         switch ([exportSession status]) {
             case AVAssetExportSessionStatusFailed:
             {
-                onCompletion(nil,exportSession.error);
+                onCompletion(nil,0,exportSession.error);
+                break;
             }
             case AVAssetExportSessionStatusCancelled:
             {
-                onCompletion(nil,exportSession.error);
+                onCompletion(nil,0,exportSession.error);
                 break;
             }
             case AVAssetExportSessionStatusCompleted:
             {
-                onCompletion(exportSession.outputURL, nil);
+                onCompletion(exportSession.outputURL,exportSession.progress,nil);
+                break;
             }
             case AVAssetExportSessionStatusUnknown:
             {
-                onCompletion(nil,exportSession.error);
+                onCompletion(nil,exportSession.progress,exportSession.error);
+                break;
+            }
+            case AVAssetExportSessionStatusExporting:
+            {
+                onCompletion(nil,exportSession.progress,exportSession.error);
+                break;
+            }
+            case AVAssetExportSessionStatusWaiting:
+            {
+                onCompletion(nil,exportSession.progress,exportSession.error);
+                break;
             }
         }
     }];
