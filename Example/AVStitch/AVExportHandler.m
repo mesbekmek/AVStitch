@@ -9,7 +9,7 @@
     
 }
 
-- (void)exportMixComposition:(AVMutableComposition *)mixComposition completion:(void (^)(NSURL *url, BOOL success))onCompletion{
+- (void)exportMixComposition:(AVMutableComposition *)mixComposition completion:(void (^)(NSURL *url, NSError *error))onCompletion{
     
     NSURL *randomFinalVideoFileURL = [self getRandomVideoFileURL];
     AVAssetExportSession *exportSession = [[AVAssetExportSession alloc] initWithAsset:mixComposition presetName:AVAssetExportPresetHighestQuality];
@@ -26,19 +26,16 @@
         switch ([exportSession status]) {
             case AVAssetExportSessionStatusFailed:
             {
-                NSLog(@"Export failed: %@ %@", [[exportSession error] localizedDescription],[[exportSession error]debugDescription]);
-                onCompletion(nil,NO);
+                onCompletion(nil,exportSession.error);
             }
             case AVAssetExportSessionStatusCancelled:
             {
-                NSLog(@"Export canceled");
-                onCompletion(nil,NO);
+                onCompletion(nil,exportSession.error);
                 break;
             }
             case AVAssetExportSessionStatusCompleted:
             {
-                NSLog(@"Export complete!");
-                onCompletion(exportSession.outputURL, YES);
+                onCompletion(exportSession.outputURL, nil);
             }
             default:
             {

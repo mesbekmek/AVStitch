@@ -14,7 +14,7 @@
             buildForArchiving = "YES">
             <BuildableReference
                BuildableIdentifier = 'primary'
-               BlueprintIdentifier = 'E150E1703D7832A910D7B25B'
+               BlueprintIdentifier = 'F5C21BE288A773C91875C06A'
                BlueprintName = 'AVStitch'
                ReferencedContainer = 'container:Pods.xcodeproj'
                BuildableName = 'AVStitch.framework'>
