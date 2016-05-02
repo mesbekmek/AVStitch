@@ -78,7 +78,7 @@ UINavigationControllerDelegate
 #pragma mark - Alert
 
 - (void)showSuccessAlert {
-    UIAlertController *controller = [UIAlertController alertControllerWithTitle:@"Success" message:[NSString stringWithFormat:@"Successfully added video file. Current count of videos is:- %d",self.videoAssetsArray.count] preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertController *controller = [UIAlertController alertControllerWithTitle:@"Success" message:[NSString stringWithFormat:@"Successfully added video file. Current count of videos is:- %lu",(unsigned long)self.videoAssetsArray.count] preferredStyle:UIAlertControllerStyleAlert];
     UIAlertAction *okAction = [UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleDefault handler:nil];
     
     [controller addAction:okAction];
